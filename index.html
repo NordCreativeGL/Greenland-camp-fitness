@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>React</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0B1116">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>React</h1>
+    <span id="day-counter">DAG — / 42</span>
+  </header>
+
+  <main id="view-training" class="view active">
+  </main>
+
+  <main id="view-food" class="view">
+  </main>
+
+  <nav class="tabbar">
+    <button data-view="training" class="tab-btn active">TRÆNING</button>
+    <button data-view="food" class="tab-btn">KOST</button>
+  </nav>
+
+  <div id="start-overlay" class="start-overlay hidden">
+    <button id="start-day-btn">START DAG 1</button>
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>
