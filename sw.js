@@ -1,10 +1,13 @@
-const CACHE_NAME = 'campapp-v1';
+const CACHE_NAME = 'campapp-v2';
 
 const APP_SHELL = [
   './',
   './index.html',
   './css/style.css',
   './js/app.js',
+  './js/data/exercises.js',
+  './js/data/schedule.js',
+  './js/program.js',
   './manifest.json',
   './icons/icon.svg',
   './fonts/oswald-latin-400-normal.woff2',
