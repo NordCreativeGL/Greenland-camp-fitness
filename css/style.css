@@ -178,3 +178,117 @@ textarea {
 .hidden {
   display: none !important;
 }
+
+.light-day-banner {
+  background: var(--color-accent-flare);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--fs-small);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-3);
+}
+
+.session-block {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-3);
+}
+
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--fs-h2);
+  cursor: pointer;
+}
+
+.session-header::-webkit-details-marker {
+  display: none;
+}
+
+.session-progress {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-text-muted);
+}
+
+.session-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.exercise-card {
+  background: var(--color-panel-alt);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.exercise-name {
+  font-size: var(--fs-body);
+}
+
+.exercise-target {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-data);
+  color: var(--color-accent-ice);
+}
+
+.set-tracker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.set-btn {
+  width: calc(var(--space-5) + var(--space-3));
+  height: calc(var(--space-5) + var(--space-3));
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+}
+
+.set-btn.checked {
+  background: var(--color-accent-ice);
+  border-color: var(--color-accent-ice);
+  color: var(--color-bg);
+}
+
+.rpe-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.rpe-btn {
+  flex: 1;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+}
+
+.rpe-btn.selected {
+  border-color: var(--color-accent-ice);
+  color: var(--color-accent-ice);
+}
