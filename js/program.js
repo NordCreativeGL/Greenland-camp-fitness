@@ -34,20 +34,8 @@ function getProgramForDay(dayNumber) {
       };
     }
 
-    if (category === 'dips' && dayNumber <= 3) {
-      const variant = EXERCISES.dips.calibration;
-      return {
-        category: 'dips',
-        categoryLabel: categoryData.label,
-        variantName: variant.name,
-        type: variant.type,
-        holdSecondsTarget: variant.baseHoldSeconds,
-        setsTarget: variant.setsTarget,
-        isCalibration: true
-      };
-    }
-
-    const variantIndex = Math.min(blockIndex, categoryData.variants.length - 1);
+    const startIndex = EXERCISES[category].startVariantIndex || 0;
+    const variantIndex = Math.min(startIndex + blockIndex, categoryData.variants.length - 1);
     const variant = categoryData.variants[variantIndex];
 
     const exercise = {
