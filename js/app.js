@@ -1,6 +1,6 @@
 (function () {
-  const TAB_KEY = 'camp_active_tab';
-  const START_KEY = 'camp_start_date';
+  const TAB_KEY = `gcf:${CURRENT_PROFILE_ID}:camp_active_tab`;
+  const START_KEY = `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:camp_start_date`;
   const TOTAL_DAYS = 42;
 
   const SESSION_LABELS = { morgen: 'Morgen', middag: 'Middag', aften: 'Aften' };
@@ -74,6 +74,14 @@
     });
   }
 
+  function buildLogKey(dayNumber, category, part, session) {
+    return `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:log_day${dayNumber}_${category}_${part}_${session}`;
+  }
+
+  function buildRpeKey(dayNumber, category, part, session) {
+    return `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:rpe_day${dayNumber}_${category}_${part}_${session}`;
+  }
+
   function getSetLog(logKey, setsTarget) {
     try {
       const raw = localStorage.getItem(logKey);
@@ -98,18 +106,51 @@
   }
 
   function formatTarget(exercise) {
+    const parts = [];
+
     if (exercise.type === 'reps') {
-      return exercise.perSide
-        ? `${exercise.setsTarget} sæt × ${exercise.repsTarget} reps pr. side`
-        : `${exercise.setsTarget} sæt × ${exercise.repsTarget} reps`;
+      parts.push(exercise.perSide
+        ? `${exercise.sets} sæt × ${exercise.reps} reps pr. side`
+        : `${exercise.sets} sæt × ${exercise.reps} reps`);
+    } else if (exercise.type === 'hold') {
+      parts.push(`${exercise.sets} sæt × ${exercise.holdSeconds}s hold`);
     }
-    if (exercise.type === 'hold') {
-      return `${exercise.setsTarget} sæt × ${exercise.holdSecondsTarget}s hold`;
+
+    if (exercise.tempo) {
+      parts.push(`tempo ${exercise.tempo}`);
     }
-    if (exercise.type === 'amrap') {
-      return `${exercise.amrapMinutes} min AMRAP`;
+    if (exercise.restSeconds) {
+      parts.push(`${exercise.restSeconds}s pause`);
     }
-    return '';
+    if (exercise.rir !== undefined && exercise.rir !== null) {
+      parts.push(`RIR ${exercise.rir}`);
+    }
+    if (exercise.note) {
+      parts.push(exercise.note);
+    }
+
+    return parts.join(' · ');
+  }
+
+  function mergePhaseExercise(exercise, phase) {
+    return {
+      ...exercise,
+      sets: phase.rounds,
+      restSeconds: phase.restSeconds
+    };
+  }
+
+  function getLoggableExercises(sessionData) {
+    if (sessionData.mode === 'single') {
+      return sessionData.exercises.filter((exercise) => exercise.type !== 'circuit');
+    }
+    if (sessionData.mode === 'alternating') {
+      return [
+        ...sessionData.primaryPhase.exercises.map((exercise) => mergePhaseExercise(exercise, sessionData.primaryPhase)),
+        ...sessionData.secondaryPhase.exercises.map((exercise) => mergePhaseExercise(exercise, sessionData.secondaryPhase))
+      ];
+    }
+    return [];
   }
 
   function updateSessionProgress(dayNumber, session) {
@@ -118,31 +159,44 @@
       return;
     }
 
-    const total = sessionData.exercises.length;
-    const completed = sessionData.exercises.reduce((count, exercise) => {
-      const setsTarget = exercise.setsTarget || 1;
-      const logKey = `log_day${dayNumber}_${exercise.category}_${session}`;
+    const progressEl = document.querySelector(`[data-session-progress="${session}"]`);
+    if (!progressEl) {
+      return;
+    }
+
+    if (sessionData.mode === 'lightDay') {
+      progressEl.textContent = [sessionData.durationNote, sessionData.note].filter(Boolean).join(' · ');
+      return;
+    }
+
+    const loggable = getLoggableExercises(sessionData);
+    if (loggable.length === 0) {
+      progressEl.textContent = '';
+      return;
+    }
+
+    const total = loggable.length;
+    const completed = loggable.reduce((count, exercise) => {
+      const setsTarget = exercise.sets || 1;
+      const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, session);
       const setLog = getSetLog(logKey, setsTarget);
       return isExerciseComplete(setLog) ? count + 1 : count;
     }, 0);
 
-    const progressEl = document.querySelector(`[data-session-progress="${session}"]`);
-    if (progressEl) {
-      progressEl.textContent = `${completed}/${total} øvelser fuldført`;
-    }
+    progressEl.textContent = `${completed}/${total} øvelser fuldført`;
   }
 
   function buildExerciseCard(dayNumber, session, exercise) {
-    const setsTarget = exercise.setsTarget || 1;
-    const logKey = `log_day${dayNumber}_${exercise.category}_${session}`;
-    const rpeKey = `rpe_day${dayNumber}_${exercise.category}_${session}`;
+    const setsTarget = exercise.sets || 1;
+    const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, session);
+    const rpeKey = buildRpeKey(dayNumber, exercise.category, exercise.part, session);
 
     const card = document.createElement('div');
     card.className = 'exercise-card';
 
     const nameEl = document.createElement('div');
     nameEl.className = 'exercise-name';
-    nameEl.textContent = `${exercise.categoryLabel} — ${exercise.variantName}`;
+    nameEl.textContent = `${exercise.categoryLabel} — ${exercise.variantName}` + (exercise.deload ? ' (deload)' : '');
     card.appendChild(nameEl);
 
     const targetEl = document.createElement('div');
@@ -200,6 +254,119 @@
     return card;
   }
 
+  function buildCircuitCard(exercise) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'exercise-name';
+    nameEl.textContent = exercise.categoryLabel + (exercise.deload ? ' (deload)' : '');
+    card.appendChild(nameEl);
+
+    exercise.exercises.forEach((item) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'exercise-target';
+      rowEl.textContent = `${item.name} — ${item.rounds} runder × ${item.workSeconds}s arbejde / ${item.restSeconds}s pause`;
+      card.appendChild(rowEl);
+    });
+
+    return card;
+  }
+
+  function buildFinisherCard(finisher) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'exercise-name';
+    nameEl.textContent = `${finisher.categoryLabel} — ${finisher.label}`;
+    card.appendChild(nameEl);
+
+    finisher.exercises.forEach((item) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'exercise-target';
+      rowEl.textContent = `${item.name} — ${item.sets} sæt × ${item.workSeconds}s`;
+      card.appendChild(rowEl);
+    });
+
+    const metaEl = document.createElement('div');
+    metaEl.className = 'exercise-target';
+    metaEl.textContent = [finisher.durationNote, finisher.restNote].filter(Boolean).join(' · ');
+    card.appendChild(metaEl);
+
+    return card;
+  }
+
+  function formatLightItemTarget(item) {
+    if (item.sets && item.reps) {
+      return `${item.sets} sæt × ${item.reps} reps`;
+    }
+    if (item.sets && item.holdSeconds) {
+      return `${item.sets} sæt × ${item.holdSeconds}s hold`;
+    }
+    return '';
+  }
+
+  function buildLightDayCard(item) {
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'exercise-name';
+    nameEl.textContent = item.name;
+    card.appendChild(nameEl);
+
+    const targetText = formatLightItemTarget(item);
+    if (targetText) {
+      const targetEl = document.createElement('div');
+      targetEl.className = 'exercise-target';
+      targetEl.textContent = targetText;
+      card.appendChild(targetEl);
+    }
+
+    return card;
+  }
+
+  function buildPhaseHeader(phase) {
+    const headerEl = document.createElement('div');
+    headerEl.className = 'exercise-target';
+    const names = phase.exercises.map((exercise) => exercise.variantName).join(' ↔ ');
+    headerEl.textContent = `${phase.rounds} runder alternerende (${names}) · ${phase.restSeconds}s pause mellem runder`;
+    return headerEl;
+  }
+
+  function renderSessionBody(dayNumber, sessionData) {
+    const body = document.createElement('div');
+    body.className = 'session-body';
+
+    if (sessionData.mode === 'single') {
+      sessionData.exercises.forEach((exercise) => {
+        if (exercise.type === 'circuit') {
+          body.appendChild(buildCircuitCard(exercise));
+        } else {
+          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, exercise));
+        }
+      });
+    } else if (sessionData.mode === 'alternating') {
+      [sessionData.primaryPhase, sessionData.secondaryPhase].forEach((phase) => {
+        body.appendChild(buildPhaseHeader(phase));
+        phase.exercises.forEach((exercise) => {
+          const displayExercise = mergePhaseExercise(exercise, phase);
+          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, displayExercise));
+        });
+      });
+      if (sessionData.finisher) {
+        body.appendChild(buildFinisherCard(sessionData.finisher));
+      }
+    } else if (sessionData.mode === 'lightDay') {
+      sessionData.items.forEach((item) => {
+        body.appendChild(buildLightDayCard(item));
+      });
+    }
+
+    return body;
+  }
+
   function renderTrainingView() {
     const container = document.getElementById('view-training');
     const dayNumber = getCurrentDayNumber();
@@ -234,14 +401,7 @@
       summary.appendChild(progressSpan);
       details.appendChild(summary);
 
-      const body = document.createElement('div');
-      body.className = 'session-body';
-
-      sessionData.exercises.forEach((exercise) => {
-        body.appendChild(buildExerciseCard(dayNumber, sessionData.session, exercise));
-      });
-
-      details.appendChild(body);
+      details.appendChild(renderSessionBody(dayNumber, sessionData));
       container.appendChild(details);
 
       updateSessionProgress(dayNumber, sessionData.session);
