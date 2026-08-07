@@ -73,6 +73,15 @@
   --tabbar-height: 64px;
 }
 
+/* -----------------------------------------------------------------------
+   Color semantics (intentional split, not ad hoc):
+   --color-accent-flare = "done / active / selected" — completed set
+   buttons, the selected RPE segment, today's column in the week overview,
+   plus its original uses (light-day banner, start action).
+   --color-accent-ice = neutral/default interactive color — borders, mono
+   data readouts, unselected states, corner-bracket accents.
+   ----------------------------------------------------------------------- */
+
 * {
   box-sizing: border-box;
 }
@@ -238,6 +247,48 @@ textarea {
   gap: var(--space-2);
 }
 
+/* Signature treatment for primary/secondary exercise cards: squared-off
+   corners with small ice-colored corner brackets, deliberately breaking
+   from --radius (rounded corners read wrong on a bracket motif). */
+.card--bracket {
+  position: relative;
+  border-radius: 0;
+}
+
+.card--bracket::before,
+.card--bracket::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+
+.card--bracket::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid var(--color-accent-ice);
+  border-left: 2px solid var(--color-accent-ice);
+}
+
+.card--bracket::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid var(--color-accent-ice);
+  border-right: 2px solid var(--color-accent-ice);
+}
+
+/* Secondary exercise cards: lighter visual weight than primary — no
+   bracket accents, dimmer panel, tighter padding, smaller heading. */
+.exercise-card--secondary {
+  background: var(--color-panel);
+  padding: var(--space-2);
+}
+
+.exercise-card--secondary .exercise-name {
+  font-size: var(--fs-small);
+}
+
 .exercise-name {
   font-size: var(--fs-body);
 }
@@ -266,29 +317,75 @@ textarea {
 }
 
 .set-btn.checked {
-  background: var(--color-accent-ice);
-  border-color: var(--color-accent-ice);
+  background: var(--color-accent-flare);
+  border-color: var(--color-accent-flare);
   color: var(--color-bg);
 }
 
 .rpe-selector {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .rpe-btn {
   flex: 1;
   padding: var(--space-2);
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
+  border: none;
+  border-right: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-muted);
   font-family: var(--font-body);
   font-size: var(--fs-small);
 }
 
+.rpe-btn:last-child {
+  border-right: none;
+}
+
 .rpe-btn.selected {
-  border-color: var(--color-accent-ice);
-  color: var(--color-accent-ice);
+  background: var(--color-accent-flare);
+  color: var(--color-bg);
+}
+
+.week-overview {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.week-day {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.week-day.today {
+  border-color: var(--color-accent-flare);
+}
+
+.week-day-number {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+.week-day.today .week-day-number {
+  color: var(--color-accent-flare);
+}
+
+.week-day-codes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
 }

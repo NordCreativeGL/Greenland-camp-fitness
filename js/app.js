@@ -5,10 +5,19 @@
 
   const SESSION_LABELS = { morgen: 'Morgen', middag: 'Middag', aften: 'Aften' };
   const RPE_OPTIONS = [
-    { key: 'harder', label: 'sværere end forventet' },
-    { key: 'asExpected', label: 'som forventet' },
-    { key: 'easier', label: 'lettere end forventet' }
+    { key: 'harder', label: 'Svært' },
+    { key: 'asExpected', label: 'Forventet' },
+    { key: 'easier', label: 'Let' }
   ];
+
+  const SINGLE_CATEGORY_CODES = {
+    legsQuad: 'LQ',
+    legsHinge: 'LH',
+    handstand: 'HS',
+    coreSkillA: 'CSA',
+    coreSkillB: 'CSB',
+    conditioning: 'COND'
+  };
 
   let currentProgram = null;
 
@@ -192,7 +201,9 @@
     const rpeKey = buildRpeKey(dayNumber, exercise.category, exercise.part, session);
 
     const card = document.createElement('div');
-    card.className = 'exercise-card';
+    card.className = exercise.part === 'secondary'
+      ? 'exercise-card exercise-card--secondary'
+      : 'exercise-card card--bracket';
 
     const nameEl = document.createElement('div');
     nameEl.className = 'exercise-name';
@@ -367,12 +378,69 @@
     return body;
   }
 
+  function getSessionCode(sessionSlot) {
+    if (sessionSlot.mode === 'alternating') {
+      const [catA, catB] = sessionSlot.categories;
+      if (catA === 'push' && catB === 'pullVertical') {
+        return 'PPA';
+      }
+      if (catA === 'dips' && catB === 'pullRow') {
+        return 'PPB';
+      }
+    }
+    return sessionSlot.categories.map((category) => SINGLE_CATEGORY_CODES[category] || category).join('/');
+  }
+
+  function buildWeekOverview(dayNumber) {
+    const weekNumber = Math.ceil(dayNumber / 7);
+    const weekStartDay = (weekNumber - 1) * 7 + 1;
+
+    const strip = document.createElement('div');
+    strip.className = 'week-overview';
+
+    for (let i = 0; i < 7; i++) {
+      const dNum = weekStartDay + i;
+      const scheduleEntry = WEEKLY_SCHEDULE[i];
+
+      const dayEl = document.createElement('div');
+      dayEl.className = 'week-day';
+      if (dNum === dayNumber) {
+        dayEl.classList.add('today');
+      }
+
+      const numberEl = document.createElement('div');
+      numberEl.className = 'week-day-number';
+      numberEl.textContent = String(dNum);
+      dayEl.appendChild(numberEl);
+
+      const codesEl = document.createElement('div');
+      codesEl.className = 'week-day-codes';
+
+      const codes = scheduleEntry.isLightDay
+        ? ['LET']
+        : ['morgen', 'middag', 'aften'].map((session) => getSessionCode(scheduleEntry.sessions[session]));
+
+      codes.forEach((code) => {
+        const codeEl = document.createElement('div');
+        codeEl.textContent = code;
+        codesEl.appendChild(codeEl);
+      });
+
+      dayEl.appendChild(codesEl);
+      strip.appendChild(dayEl);
+    }
+
+    return strip;
+  }
+
   function renderTrainingView() {
     const container = document.getElementById('view-training');
     const dayNumber = getCurrentDayNumber();
     currentProgram = getProgramForDay(dayNumber);
 
     container.innerHTML = '';
+
+    container.appendChild(buildWeekOverview(dayNumber));
 
     if (currentProgram.isLightDay) {
       const banner = document.createElement('div');
