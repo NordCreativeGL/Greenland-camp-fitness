@@ -19,6 +19,18 @@
     conditioning: 'COND'
   };
 
+  const GLOSSARY_SESSION_CODES = [
+    ['PPA', 'Push-Pull A'],
+    ['PPB', 'Push-Pull B'],
+    ['LQ', 'Ben, squat'],
+    ['LH', 'Ben, hofte/hamstring'],
+    ['HS', 'Håndstand'],
+    ['CSA', 'Core/Skill A — L-sit'],
+    ['CSB', 'Core/Skill B — Dragon Flag'],
+    ['COND', 'Kondition'],
+    ['LET', 'Let dag']
+  ];
+
   let currentProgram = null;
 
   function setActiveTab(view) {
@@ -83,6 +95,67 @@
     });
   }
 
+  function buildGlossarySection(heading, bodyEl) {
+    const section = document.createElement('div');
+    section.className = 'glossary-section';
+
+    const headingEl = document.createElement('h3');
+    headingEl.textContent = heading;
+    section.appendChild(headingEl);
+    section.appendChild(bodyEl);
+
+    return section;
+  }
+
+  function buildGlossaryContent() {
+    const wrapper = document.createDocumentFragment();
+
+    const codesList = document.createElement('dl');
+    codesList.className = 'glossary-list';
+    GLOSSARY_SESSION_CODES.forEach(([code, description]) => {
+      const row = document.createElement('div');
+      row.className = 'glossary-row';
+
+      const dt = document.createElement('dt');
+      dt.textContent = code;
+      const dd = document.createElement('dd');
+      dd.textContent = description;
+
+      row.appendChild(dt);
+      row.appendChild(dd);
+      codesList.appendChild(row);
+    });
+    wrapper.appendChild(buildGlossarySection('Session-koder', codesList));
+
+    const tempoText = document.createElement('p');
+    tempoText.textContent = 'Fire tal = excentrisk-pause-koncentrisk-pause i sekunder (fx 2-0-1-1 = 2s ned, 0s pause, 1s op, 1s pause i top).';
+    wrapper.appendChild(buildGlossarySection('Tempo', tempoText));
+
+    const rirText = document.createElement('p');
+    rirText.textContent = 'Reps tilbage i tanken før du ville fejle sættet.';
+    wrapper.appendChild(buildGlossarySection('RIR', rirText));
+
+    return wrapper;
+  }
+
+  function initGlossary() {
+    const overlay = document.getElementById('glossary-overlay');
+    const content = document.getElementById('glossary-content');
+    content.appendChild(buildGlossaryContent());
+
+    document.getElementById('glossary-btn').addEventListener('click', () => {
+      overlay.classList.remove('hidden');
+    });
+    document.getElementById('glossary-close-btn').addEventListener('click', () => {
+      overlay.classList.add('hidden');
+    });
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        overlay.classList.add('hidden');
+      }
+    });
+  }
+
   function buildLogKey(dayNumber, category, part, session) {
     return `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:log_day${dayNumber}_${category}_${part}_${session}`;
   }
@@ -114,6 +187,10 @@
     return setLog.length > 0 && setLog.every(Boolean);
   }
 
+  function formatTempo(tempo) {
+    return String(tempo).split('').join('-');
+  }
+
   function formatTarget(exercise) {
     const parts = [];
 
@@ -126,7 +203,7 @@
     }
 
     if (exercise.tempo) {
-      parts.push(`tempo ${exercise.tempo}`);
+      parts.push(`tempo ${formatTempo(exercise.tempo)}`);
     }
     if (exercise.restSeconds) {
       parts.push(`${exercise.restSeconds}s pause`);
@@ -499,6 +576,7 @@
 
   initTabs();
   initStartOverlay();
+  initGlossary();
   renderDayCounter();
   renderTrainingView();
   initServiceWorker();
