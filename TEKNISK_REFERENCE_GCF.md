@@ -82,6 +82,8 @@ Konsekvens (låst designbeslutning): med disse baseline-tal er standard push-ups
 
 **Primær/sekundær + alternerende-par som arkitektonisk låst beslutning:** Push+PullVertical og Dips+PullRow trænes IKKE i separate sessioner — de alterneres runde-for-runde i samme session (§2). Dette er en bevidst ændring i forhold til handoverets oprindelige antagelse om at genbruge et uændret variants-array (§10, dokumentets afsluttende note) — datamodellen kræver derfor både et sekundær-felt og et flag for "alternerende par", implementeret i `js/data/schedule.js` (`mode: 'alternating'`) og `js/program.js` (`buildAlternatingSession`).
 
+**Primær/sekundær visuel vægt som låst designbeslutning:** primære øvelser får `.card--bracket` (hjørne-accenter i `--color-accent-ice`, `--color-panel-alt`-baggrund, fuld padding/heading-størrelse); sekundære øvelser får `.exercise-card--secondary` (ingen hjørne-accenter, `--color-panel`-baggrund, mindre heading og padding). Enkelt-øvelse-kategorierne `legsQuad` og `legsHinge` har intet `secondary`-felt i `js/data/exercises.js` og renderer derfor altid med brackets. Rationale i én linje: primær er sessionens visuelle fokuspunkt, sekundær er bevidst mere tilbagetrukket.
+
 **Andre låste programbeslutninger:**
 - Uge 4-deload er obligatorisk, ikke valgfri, selv ved god form (§9).
 - Dag 7 er aktiv restitution, IKKE en nul-dag — eksplicit låst beslutning fra handover (§8).
