@@ -266,6 +266,15 @@ textarea {
   gap: var(--space-2);
 }
 
+.superset-badge {
+  align-self: flex-start;
+  background: var(--color-accent-flare);
+  color: var(--color-bg);
+  font-size: var(--fs-small);
+  padding: 2px 8px;
+  border-radius: var(--radius);
+}
+
 /* Signature treatment for primary/secondary exercise cards: squared-off
    corners with small ice-colored corner brackets, deliberately breaking
    from --radius (rounded corners read wrong on a bracket motif). */

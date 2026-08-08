@@ -421,12 +421,11 @@
     return card;
   }
 
-  function buildPhaseHeader(phase) {
-    const headerEl = document.createElement('div');
-    headerEl.className = 'exercise-target';
-    const names = phase.exercises.map((exercise) => exercise.variantName).join(' ↔ ');
-    headerEl.textContent = `${phase.rounds} runder alternerende (${names}) · ${phase.restSeconds}s pause mellem runder`;
-    return headerEl;
+  function buildSupersetBadge() {
+    const badge = document.createElement('div');
+    badge.className = 'superset-badge';
+    badge.textContent = 'Supersæt';
+    return badge;
   }
 
   function renderSessionBody(dayNumber, sessionData, interactive) {
@@ -443,7 +442,7 @@
       });
     } else if (sessionData.mode === 'alternating') {
       [sessionData.primaryPhase, sessionData.secondaryPhase].forEach((phase) => {
-        body.appendChild(buildPhaseHeader(phase));
+        body.appendChild(buildSupersetBadge());
         phase.exercises.forEach((exercise) => {
           const displayExercise = mergePhaseExercise(exercise, phase);
           body.appendChild(buildExerciseCard(dayNumber, sessionData.session, displayExercise, interactive));
