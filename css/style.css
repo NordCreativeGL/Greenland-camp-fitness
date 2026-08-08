@@ -355,6 +355,12 @@ textarea {
   color: var(--color-bg);
 }
 
+.set-btn:disabled,
+.rpe-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .week-overview {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -371,6 +377,11 @@ textarea {
   align-items: center;
   gap: var(--space-1);
   text-align: center;
+  cursor: pointer;
+}
+
+.week-day.viewing {
+  border-color: var(--color-accent-ice);
 }
 
 .week-day.today {

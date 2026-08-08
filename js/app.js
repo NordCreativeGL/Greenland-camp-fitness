@@ -61,7 +61,7 @@
     );
   }
 
-  function renderDayCounter() {
+  function renderDayCounter(dayNumber) {
     const dayCounterEl = document.getElementById('day-counter');
     const startDateRaw = localStorage.getItem(START_KEY);
 
@@ -70,8 +70,8 @@
       return;
     }
 
-    const dayNumber = getCurrentDayNumber();
-    dayCounterEl.textContent = `DAG ${dayNumber} / ${TOTAL_DAYS}`;
+    const displayDay = dayNumber === undefined ? getCurrentDayNumber() : dayNumber;
+    dayCounterEl.textContent = `DAG ${displayDay} / ${TOTAL_DAYS}`;
   }
 
   function initStartOverlay() {
@@ -195,7 +195,7 @@
     progressEl.textContent = `${completed}/${total} øvelser fuldført`;
   }
 
-  function buildExerciseCard(dayNumber, session, exercise) {
+  function buildExerciseCard(dayNumber, session, exercise, interactive) {
     const setsTarget = exercise.sets || 1;
     const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, session);
     const rpeKey = buildRpeKey(dayNumber, exercise.category, exercise.part, session);
@@ -226,14 +226,17 @@
       setBtn.textContent = String(i + 1);
       setBtn.classList.toggle('checked', !!setLog[i]);
       setBtn.setAttribute('aria-pressed', String(!!setLog[i]));
+      setBtn.disabled = !interactive;
 
-      setBtn.addEventListener('click', () => {
-        setLog[i] = !setLog[i];
-        saveSetLog(logKey, setLog);
-        setBtn.classList.toggle('checked', setLog[i]);
-        setBtn.setAttribute('aria-pressed', String(setLog[i]));
-        updateSessionProgress(dayNumber, session);
-      });
+      if (interactive) {
+        setBtn.addEventListener('click', () => {
+          setLog[i] = !setLog[i];
+          saveSetLog(logKey, setLog);
+          setBtn.classList.toggle('checked', setLog[i]);
+          setBtn.setAttribute('aria-pressed', String(setLog[i]));
+          updateSessionProgress(dayNumber, session);
+        });
+      }
 
       setTracker.appendChild(setBtn);
     }
@@ -250,12 +253,15 @@
       rpeBtn.className = 'rpe-btn';
       rpeBtn.textContent = option.label;
       rpeBtn.classList.toggle('selected', savedRpe === option.key);
+      rpeBtn.disabled = !interactive;
 
-      rpeBtn.addEventListener('click', () => {
-        localStorage.setItem(rpeKey, option.key);
-        rpeSelector.querySelectorAll('.rpe-btn').forEach((btn) => btn.classList.remove('selected'));
-        rpeBtn.classList.add('selected');
-      });
+      if (interactive) {
+        rpeBtn.addEventListener('click', () => {
+          localStorage.setItem(rpeKey, option.key);
+          rpeSelector.querySelectorAll('.rpe-btn').forEach((btn) => btn.classList.remove('selected'));
+          rpeBtn.classList.add('selected');
+        });
+      }
 
       rpeSelector.appendChild(rpeBtn);
     });
@@ -346,7 +352,7 @@
     return headerEl;
   }
 
-  function renderSessionBody(dayNumber, sessionData) {
+  function renderSessionBody(dayNumber, sessionData, interactive) {
     const body = document.createElement('div');
     body.className = 'session-body';
 
@@ -355,7 +361,7 @@
         if (exercise.type === 'circuit') {
           body.appendChild(buildCircuitCard(exercise));
         } else {
-          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, exercise));
+          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, exercise, interactive));
         }
       });
     } else if (sessionData.mode === 'alternating') {
@@ -363,7 +369,7 @@
         body.appendChild(buildPhaseHeader(phase));
         phase.exercises.forEach((exercise) => {
           const displayExercise = mergePhaseExercise(exercise, phase);
-          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, displayExercise));
+          body.appendChild(buildExerciseCard(dayNumber, sessionData.session, displayExercise, interactive));
         });
       });
       if (sessionData.finisher) {
@@ -391,8 +397,8 @@
     return sessionSlot.categories.map((category) => SINGLE_CATEGORY_CODES[category] || category).join('/');
   }
 
-  function buildWeekOverview(dayNumber) {
-    const weekNumber = Math.ceil(dayNumber / 7);
+  function buildWeekOverview(viewedDayNumber, todayNumber) {
+    const weekNumber = Math.ceil(todayNumber / 7);
     const weekStartDay = (weekNumber - 1) * 7 + 1;
 
     const strip = document.createElement('div');
@@ -404,9 +410,11 @@
 
       const dayEl = document.createElement('div');
       dayEl.className = 'week-day';
-      if (dNum === dayNumber) {
-        dayEl.classList.add('today');
-      }
+      dayEl.classList.toggle('viewing', dNum === viewedDayNumber);
+      dayEl.classList.toggle('today', dNum === todayNumber);
+      dayEl.addEventListener('click', () => {
+        renderTrainingView(dNum);
+      });
 
       const numberEl = document.createElement('div');
       numberEl.className = 'week-day-number';
@@ -433,14 +441,19 @@
     return strip;
   }
 
-  function renderTrainingView() {
+  function renderTrainingView(dayNumber = getCurrentDayNumber()) {
     const container = document.getElementById('view-training');
-    const dayNumber = getCurrentDayNumber();
-    currentProgram = getProgramForDay(dayNumber);
+    const todayNumber = getCurrentDayNumber();
+    const viewedDay = Math.min(TOTAL_DAYS, Math.max(1, dayNumber));
+    const interactive = viewedDay <= todayNumber;
+
+    currentProgram = getProgramForDay(viewedDay);
+
+    renderDayCounter(viewedDay);
 
     container.innerHTML = '';
 
-    container.appendChild(buildWeekOverview(dayNumber));
+    container.appendChild(buildWeekOverview(viewedDay, todayNumber));
 
     if (currentProgram.isLightDay) {
       const banner = document.createElement('div');
@@ -469,10 +482,10 @@
       summary.appendChild(progressSpan);
       details.appendChild(summary);
 
-      details.appendChild(renderSessionBody(dayNumber, sessionData));
+      details.appendChild(renderSessionBody(viewedDay, sessionData, interactive));
       container.appendChild(details);
 
-      updateSessionProgress(dayNumber, sessionData.session);
+      updateSessionProgress(viewedDay, sessionData.session);
     });
   }
 
