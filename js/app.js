@@ -367,10 +367,18 @@
       ? 'exercise-card exercise-card--secondary card-face card-face--front'
       : 'exercise-card card--bracket card-face card-face--front';
 
+    const headerRow = document.createElement('div');
+    headerRow.className = 'card-header';
+
     const nameEl = document.createElement('div');
     nameEl.className = 'exercise-name';
     nameEl.textContent = `${exercise.categoryLabel} — ${exercise.variantName}` + (exercise.deload ? ' (deload)' : '');
-    card.appendChild(nameEl);
+    headerRow.appendChild(nameEl);
+
+    const infoBtn = buildInfoButton('Vis teknik-info', '↻');
+    headerRow.appendChild(infoBtn);
+
+    card.appendChild(headerRow);
 
     const targetEl = document.createElement('div');
     targetEl.className = 'exercise-target';
@@ -436,9 +444,7 @@
     const flipInner = document.createElement('div');
     flipInner.className = 'card-flip-inner';
 
-    const infoBtn = buildInfoButton('Vis teknik-info', '?');
     infoBtn.addEventListener('click', () => flipWrap.classList.add('flipped'));
-    card.appendChild(infoBtn);
 
     const backCard = buildExerciseCardBack(exercise, isSecondary);
     const closeBtn = buildInfoButton('Luk teknik-info', '×');

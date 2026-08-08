@@ -294,10 +294,24 @@ textarea {
 }
 
 .card-info-btn {
+  flex-shrink: 0;
+}
+
+.card-face--back .card-info-btn {
   position: absolute;
   top: var(--space-2);
   right: var(--space-2);
-  flex-shrink: 0;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.card-header .exercise-name {
+  flex: 1;
+  min-width: 0;
 }
 
 .card-back-name {
