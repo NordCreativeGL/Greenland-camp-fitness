@@ -272,15 +272,100 @@
     progressEl.textContent = `${completed}/${total} øvelser fuldført`;
   }
 
+  const TEMPO_PHASE_LABELS = ['excentrisk (ned)', 'pause i bund', 'koncentrisk (op)', 'pause i top'];
+
+  function buildDecoderBlock(exercise) {
+    const fragment = document.createDocumentFragment();
+
+    if (exercise.type === 'reps' && exercise.tempo) {
+      const heading = document.createElement('div');
+      heading.className = 'card-back-heading';
+      heading.textContent = `Tempo ${formatTempo(exercise.tempo)}`;
+      fragment.appendChild(heading);
+
+      const digits = String(exercise.tempo).split('');
+      const decoded = digits.map((digit, i) => `${digit}s ${TEMPO_PHASE_LABELS[i]}`).join(' · ');
+      const line = document.createElement('div');
+      line.className = 'card-back-text';
+      line.textContent = decoded;
+      fragment.appendChild(line);
+    }
+
+    if (exercise.rir !== undefined && exercise.rir !== null) {
+      const heading = document.createElement('div');
+      heading.className = 'card-back-heading';
+      heading.textContent = `RIR ${exercise.rir}`;
+      fragment.appendChild(heading);
+
+      const line = document.createElement('div');
+      line.className = 'card-back-text';
+      line.textContent = `${exercise.rir} reps tilbage i tanken før du ville fejle sættet`;
+      fragment.appendChild(line);
+    }
+
+    return fragment;
+  }
+
+  function buildFormGuideList(exercise) {
+    const cues = FORM_GUIDE[exercise.variantName];
+    if (!cues) {
+      return null;
+    }
+
+    const list = document.createElement('ul');
+    list.className = 'card-back-cues';
+    cues.forEach((cue) => {
+      const li = document.createElement('li');
+      li.textContent = cue;
+      list.appendChild(li);
+    });
+    return list;
+  }
+
+  function buildInfoButton(label, symbol) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'glossary-btn card-info-btn';
+    btn.setAttribute('aria-label', label);
+    btn.textContent = symbol;
+    return btn;
+  }
+
+  function buildExerciseCardBack(exercise, isSecondary) {
+    const card = document.createElement('div');
+    card.className = isSecondary
+      ? 'exercise-card exercise-card--secondary card-face card-face--back'
+      : 'exercise-card card--bracket card-face card-face--back';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'exercise-name card-back-name';
+    nameEl.textContent = `${exercise.categoryLabel} — ${exercise.variantName}`;
+    card.appendChild(nameEl);
+
+    card.appendChild(buildDecoderBlock(exercise));
+
+    const divider = document.createElement('hr');
+    divider.className = 'card-back-divider';
+    card.appendChild(divider);
+
+    const cuesList = buildFormGuideList(exercise);
+    if (cuesList) {
+      card.appendChild(cuesList);
+    }
+
+    return card;
+  }
+
   function buildExerciseCard(dayNumber, session, exercise, interactive) {
     const setsTarget = exercise.sets || 1;
     const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, session);
     const rpeKey = buildRpeKey(dayNumber, exercise.category, exercise.part, session);
+    const isSecondary = exercise.part === 'secondary';
 
     const card = document.createElement('div');
-    card.className = exercise.part === 'secondary'
-      ? 'exercise-card exercise-card--secondary'
-      : 'exercise-card card--bracket';
+    card.className = isSecondary
+      ? 'exercise-card exercise-card--secondary card-face card-face--front'
+      : 'exercise-card card--bracket card-face card-face--front';
 
     const nameEl = document.createElement('div');
     nameEl.className = 'exercise-name';
@@ -345,7 +430,26 @@
 
     card.appendChild(rpeSelector);
 
-    return card;
+    const flipWrap = document.createElement('div');
+    flipWrap.className = 'card-flip';
+
+    const flipInner = document.createElement('div');
+    flipInner.className = 'card-flip-inner';
+
+    const infoBtn = buildInfoButton('Vis teknik-info', '?');
+    infoBtn.addEventListener('click', () => flipWrap.classList.add('flipped'));
+    card.appendChild(infoBtn);
+
+    const backCard = buildExerciseCardBack(exercise, isSecondary);
+    const closeBtn = buildInfoButton('Luk teknik-info', '×');
+    closeBtn.addEventListener('click', () => flipWrap.classList.remove('flipped'));
+    backCard.appendChild(closeBtn);
+
+    flipInner.appendChild(card);
+    flipInner.appendChild(backCard);
+    flipWrap.appendChild(flipInner);
+
+    return flipWrap;
   }
 
   function buildCircuitCard(exercise) {
