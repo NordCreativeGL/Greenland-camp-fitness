@@ -282,6 +282,7 @@ textarea {
    bracket accents, dimmer panel, tighter padding, smaller heading. */
 .exercise-card--secondary {
   background: var(--color-panel);
+  border: 1px dashed var(--color-border);
   padding: var(--space-2);
 }
 
@@ -314,6 +315,11 @@ textarea {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: var(--fs-body);
+}
+
+.exercise-card--secondary .set-btn {
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .set-btn.checked {
