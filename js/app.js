@@ -375,7 +375,7 @@
     nameEl.textContent = `${exercise.categoryLabel} — ${exercise.variantName}` + (exercise.deload ? ' (deload)' : '');
     headerRow.appendChild(nameEl);
 
-    const infoBtn = buildInfoButton('Vis teknik-info', '↻');
+    const infoBtn = buildInfoButton('Vis teknik-info', '→');
     headerRow.appendChild(infoBtn);
 
     card.appendChild(headerRow);
