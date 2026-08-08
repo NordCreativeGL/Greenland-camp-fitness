@@ -387,15 +387,11 @@ textarea {
 }
 
 /* Secondary exercise cards: lighter visual weight than primary — no
-   bracket accents, dimmer panel, tighter padding, smaller heading. */
+   bracket accents, dimmer panel, tighter padding. */
 .exercise-card--secondary {
   background: var(--color-panel);
   border: 1px dashed var(--color-border);
   padding: var(--space-2);
-}
-
-.exercise-card--secondary .exercise-name {
-  font-size: var(--fs-small);
 }
 
 .exercise-name {
