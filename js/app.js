@@ -5,9 +5,9 @@
 
   const SESSION_LABELS = { morgen: 'Morgen', middag: 'Middag', aften: 'Aften' };
   const RPE_OPTIONS = [
-    { key: 'harder', label: 'Svært' },
+    { key: 'easier', label: 'Let' },
     { key: 'asExpected', label: 'Forventet' },
-    { key: 'easier', label: 'Let' }
+    { key: 'harder', label: 'Svært' }
   ];
 
   const SINGLE_CATEGORY_CODES = {
