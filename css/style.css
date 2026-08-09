@@ -363,18 +363,26 @@ textarea {
 
 .dashboard-week-day {
   flex: 1;
-  aspect-ratio: 1;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  padding: var(--space-2) 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   font-family: var(--font-mono);
   font-size: 12px;
-  gap: 6px;
+  gap: 4px;
   color: var(--color-text-muted);
   cursor: pointer;
+  text-align: center;
+}
+
+.dashboard-week-day-codes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 9px;
+  line-height: 1.3;
 }
 
 .dashboard-week-day.today {

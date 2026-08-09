@@ -452,6 +452,19 @@
       numberEl.textContent = String(dayNumber);
       dayEl.appendChild(numberEl);
 
+      const scheduleEntry = WEEKLY_SCHEDULE[dayNumber - weekStartDay];
+      const codesEl = document.createElement('div');
+      codesEl.className = 'dashboard-week-day-codes';
+      const codes = scheduleEntry.isLightDay
+        ? ['LET']
+        : ['morgen', 'middag', 'aften'].map((session) => getSessionCode(scheduleEntry.sessions[session]));
+      codes.forEach((code) => {
+        const codeEl = document.createElement('div');
+        codeEl.textContent = code;
+        codesEl.appendChild(codeEl);
+      });
+      dayEl.appendChild(codesEl);
+
       const dotEl = document.createElement('div');
       dotEl.className = 'dashboard-week-day-dot';
       dayEl.appendChild(dotEl);
