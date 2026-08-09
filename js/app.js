@@ -218,7 +218,7 @@
     if (entries.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'food-log-empty';
-      empty.textContent = 'Ikke logget noget endnu i dag.';
+      empty.textContent = 'Intet logget';
       list.appendChild(empty);
     }
 
