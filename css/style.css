@@ -117,6 +117,7 @@ textarea {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: var(--fs-h1);
+  cursor: pointer;
 }
 
 #day-counter {
@@ -207,7 +208,7 @@ textarea {
   color: var(--color-accent-ice);
 }
 
-.start-overlay {
+.dashboard-overlay {
   position: fixed;
   inset: 0;
   background: var(--color-bg);
@@ -217,7 +218,7 @@ textarea {
   z-index: 100;
 }
 
-.start-overlay button {
+.dashboard-overlay button {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.05em;

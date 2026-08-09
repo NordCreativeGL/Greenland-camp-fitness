@@ -78,7 +78,7 @@
     const startDateRaw = localStorage.getItem(START_KEY);
 
     if (!startDateRaw) {
-      document.getElementById('start-overlay').classList.remove('hidden');
+      document.getElementById('dashboard-overlay').classList.remove('hidden');
       return;
     }
 
@@ -86,12 +86,15 @@
     dayCounterEl.textContent = `DAG ${displayDay} / ${TOTAL_DAYS}`;
   }
 
-  function initStartOverlay() {
+  function initDashboard() {
     document.getElementById('start-day-btn').addEventListener('click', () => {
       localStorage.setItem(START_KEY, new Date().toISOString());
-      document.getElementById('start-overlay').classList.add('hidden');
+      document.getElementById('dashboard-overlay').classList.add('hidden');
       renderDayCounter();
       renderTrainingView();
+    });
+    document.getElementById('app-title').addEventListener('click', () => {
+      document.getElementById('dashboard-overlay').classList.remove('hidden');
     });
   }
 
@@ -699,7 +702,7 @@
   }
 
   initTabs();
-  initStartOverlay();
+  initDashboard();
   initGlossary();
   initMenu();
   renderDayCounter();
