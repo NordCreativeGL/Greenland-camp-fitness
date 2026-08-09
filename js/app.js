@@ -475,6 +475,19 @@
 
     document.getElementById('dashboard-kost-day-label').textContent = `Dag ${summary.dayNumber}`;
 
+    const foodEntries = getFoodLog(summary.dayNumber);
+    const foodTotals = foodEntries.reduce((acc, entry) => {
+      if (!entry.isFreetext) {
+        acc.kcal += entry.kcal;
+      }
+      acc.count += 1;
+      return acc;
+    }, { kcal: 0, count: 0 });
+
+    document.getElementById('dashboard-kost-summary').textContent = foodTotals.count > 0
+      ? `${Math.round(foodTotals.kcal)} kcal logget i dag (${foodTotals.count} ${foodTotals.count === 1 ? 'post' : 'poster'})`
+      : 'Intet logget endnu i dag.';
+
     document.getElementById('stat-sets').textContent = getWeekSetsLogged(summary.weekNumber);
     document.getElementById('stat-streak').textContent = getStreak(todayNumber);
     document.getElementById('stat-program').textContent = `${Math.round((todayNumber / TOTAL_DAYS) * 100)}%`;
