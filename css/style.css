@@ -441,7 +441,7 @@ textarea {
 }
 
 .food-select {
-  flex: 0 1 130px;
+  flex: 1 1 auto;
   min-width: 0;
   background: var(--color-panel);
   border: 1px solid var(--color-border);
