@@ -589,7 +589,7 @@
       return acc;
     }, { kcal: 0, count: 0 });
 
-    document.getElementById('dashboard-kost-summary').textContent = foodTotals.count > 0
+    document.getElementById('dashboard-kost-totals').textContent = foodTotals.count > 0
       ? `${Math.round(foodTotals.kcal)} kcal logget i dag (${foodTotals.count} ${foodTotals.count === 1 ? 'post' : 'poster'})`
       : 'Intet logget';
 
