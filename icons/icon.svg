@@ -12,5 +12,5 @@
   <polygon points="256,120 356,320 156,320" fill="#8FD8E0"/>
   <polygon points="150,180 230,320 70,320" fill="#8FD8E0" opacity="0.75"/>
   <polygon points="362,180 442,320 282,320" fill="#8FD8E0" opacity="0.75"/>
-  <text x="256" y="420" text-anchor="middle" font-family="Oswald" font-weight="600" font-size="120" textLength="372" lengthAdjust="spacingAndGlyphs" fill="#E5EDF0">REACT</text>
+  <text x="256" y="455" text-anchor="middle" font-family="Oswald" font-weight="600" font-size="105" textLength="372" lengthAdjust="spacingAndGlyphs" fill="#E5EDF0">REACT</text>
 </svg>
