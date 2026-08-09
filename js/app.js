@@ -43,6 +43,215 @@
     document.querySelector('.tabbar').classList.toggle('hidden', view === 'dashboard');
   }
 
+  function buildFoodLogKey(dayNumber) {
+    return `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:food_day${dayNumber}`;
+  }
+
+  function getFoodLog(dayNumber) {
+    const raw = localStorage.getItem(buildFoodLogKey(dayNumber));
+    if (!raw) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveFoodLog(dayNumber, entries) {
+    localStorage.setItem(buildFoodLogKey(dayNumber), JSON.stringify(entries));
+  }
+
+  function computeMacros(foodKey, grams) {
+    const food = FOOD_DATABASE[foodKey];
+    if (!food) {
+      return null;
+    }
+    const factor = grams / 100;
+    return {
+      kcal: Math.round(food.kcal * factor),
+      protein: Math.round(food.protein * factor * 10) / 10,
+      carbs: Math.round(food.carbs * factor * 10) / 10,
+      fat: Math.round(food.fat * factor * 10) / 10
+    };
+  }
+
+  function renderFoodView() {
+    const dayNumber = getCurrentDayNumber();
+    const container = document.getElementById('view-food');
+    const entries = getFoodLog(dayNumber);
+
+    container.innerHTML = '';
+
+    const form = document.createElement('div');
+    form.className = 'food-form';
+
+    const select = document.createElement('select');
+    select.className = 'food-select';
+
+    const categories = {};
+    Object.keys(FOOD_DATABASE).forEach((key) => {
+      const food = FOOD_DATABASE[key];
+      if (!categories[food.category]) {
+        categories[food.category] = [];
+      }
+      categories[food.category].push(key);
+    });
+
+    Object.keys(categories).forEach((category) => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = category;
+      categories[category].forEach((key) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = FOOD_DATABASE[key].label;
+        optgroup.appendChild(option);
+      });
+      select.appendChild(optgroup);
+    });
+
+    const gramsInput = document.createElement('input');
+    gramsInput.type = 'number';
+    gramsInput.className = 'food-grams-input';
+    gramsInput.value = '200';
+    gramsInput.min = '1';
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'food-add-btn';
+    addBtn.textContent = 'Tilføj';
+    addBtn.addEventListener('click', () => {
+      const foodKey = select.value;
+      const grams = parseInt(gramsInput.value, 10) || 0;
+      if (!foodKey || grams <= 0) {
+        return;
+      }
+      const macros = computeMacros(foodKey, grams);
+      const newEntries = getFoodLog(dayNumber);
+      newEntries.push({
+        id: Date.now(),
+        label: FOOD_DATABASE[foodKey].label,
+        grams,
+        kcal: macros.kcal,
+        protein: macros.protein,
+        carbs: macros.carbs,
+        fat: macros.fat,
+        isFreetext: false
+      });
+      saveFoodLog(dayNumber, newEntries);
+      renderFoodView();
+    });
+
+    form.appendChild(select);
+    form.appendChild(gramsInput);
+    form.appendChild(addBtn);
+    container.appendChild(form);
+
+    const freetextForm = document.createElement('div');
+    freetextForm.className = 'food-freetext-form';
+
+    const freetextInput = document.createElement('input');
+    freetextInput.type = 'text';
+    freetextInput.className = 'food-freetext-input';
+    freetextInput.placeholder = 'Andet — skriv hvad du spiste';
+
+    const freetextAddBtn = document.createElement('button');
+    freetextAddBtn.className = 'food-add-btn food-add-btn--secondary';
+    freetextAddBtn.textContent = 'Tilføj';
+    freetextAddBtn.addEventListener('click', () => {
+      const text = freetextInput.value.trim();
+      if (!text) {
+        return;
+      }
+      const newEntries = getFoodLog(dayNumber);
+      newEntries.push({
+        id: Date.now(),
+        label: text,
+        grams: null,
+        kcal: null,
+        protein: null,
+        carbs: null,
+        fat: null,
+        isFreetext: true
+      });
+      saveFoodLog(dayNumber, newEntries);
+      renderFoodView();
+    });
+
+    freetextForm.appendChild(freetextInput);
+    freetextForm.appendChild(freetextAddBtn);
+    container.appendChild(freetextForm);
+
+    const totals = entries.reduce((acc, entry) => {
+      if (!entry.isFreetext) {
+        acc.kcal += entry.kcal;
+        acc.protein += entry.protein;
+        acc.carbs += entry.carbs;
+        acc.fat += entry.fat;
+      }
+      return acc;
+    }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+
+    const totalsEl = document.createElement('div');
+    totalsEl.className = 'food-totals';
+    const totalsValueEl = document.createElement('div');
+    totalsValueEl.className = 'food-totals-value';
+    totalsValueEl.textContent = `${Math.round(totals.kcal)} kcal`;
+    const totalsMacrosEl = document.createElement('div');
+    totalsMacrosEl.className = 'food-totals-macros';
+    totalsMacrosEl.textContent = `P ${Math.round(totals.protein * 10) / 10}g · K ${Math.round(totals.carbs * 10) / 10}g · F ${Math.round(totals.fat * 10) / 10}g`;
+    totalsEl.appendChild(totalsValueEl);
+    totalsEl.appendChild(totalsMacrosEl);
+    container.appendChild(totalsEl);
+
+    const list = document.createElement('div');
+    list.className = 'food-log-list';
+
+    if (entries.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'food-log-empty';
+      empty.textContent = 'Ikke logget noget endnu i dag.';
+      list.appendChild(empty);
+    }
+
+    entries.forEach((entry) => {
+      const row = document.createElement('div');
+      row.className = 'food-log-row';
+
+      const info = document.createElement('div');
+      info.className = 'food-log-info';
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'food-log-name';
+      nameEl.textContent = entry.isFreetext ? entry.label : `${entry.label} · ${entry.grams}g`;
+      info.appendChild(nameEl);
+
+      const macroEl = document.createElement('div');
+      macroEl.className = 'food-log-macros';
+      macroEl.textContent = entry.isFreetext
+        ? 'Ikke beregnet'
+        : `${entry.kcal} kcal · P ${entry.protein}g · K ${entry.carbs}g · F ${entry.fat}g`;
+      info.appendChild(macroEl);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'food-log-remove';
+      removeBtn.setAttribute('aria-label', 'Fjern');
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => {
+        const filtered = getFoodLog(dayNumber).filter((e) => e.id !== entry.id);
+        saveFoodLog(dayNumber, filtered);
+        renderFoodView();
+      });
+
+      row.appendChild(info);
+      row.appendChild(removeBtn);
+      list.appendChild(row);
+    });
+
+    container.appendChild(list);
+  }
+
   function initTabs() {
     document.querySelectorAll('.tab-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -52,12 +261,18 @@
         if (view === 'training') {
           renderTrainingView();
         }
+        if (view === 'food') {
+          renderFoodView();
+        }
       });
     });
 
     const savedTab = localStorage.getItem(TAB_KEY);
     if (savedTab) {
       setActiveTab(savedTab);
+      if (savedTab === 'food') {
+        renderFoodView();
+      }
     }
   }
 
@@ -277,6 +492,7 @@
     document.getElementById('food-day-btn').addEventListener('click', () => {
       setActiveTab('food');
       localStorage.setItem(TAB_KEY, 'food');
+      renderFoodView();
     });
 
     document.getElementById('app-title').addEventListener('click', () => {

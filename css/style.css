@@ -426,6 +426,138 @@ textarea {
   display: none !important;
 }
 
+.food-form {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.food-select {
+  flex: 1;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  padding: var(--space-2);
+}
+
+.food-grams-input {
+  width: 72px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  padding: var(--space-2);
+}
+
+.food-add-btn {
+  background: var(--color-accent-flare);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: var(--fs-small);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+}
+
+.food-add-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-accent-ice);
+}
+
+.food-freetext-form {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.food-freetext-input {
+  flex: 1;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  padding: var(--space-2);
+}
+
+.food-totals {
+  background: var(--color-panel-alt);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  text-align: center;
+}
+
+.food-totals-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-display);
+  color: var(--color-accent-ice);
+}
+
+.food-totals-macros {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.food-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.food-log-empty {
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-3);
+}
+
+.food-log-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-panel-alt);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+}
+
+.food-log-name {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  color: var(--color-text);
+}
+
+.food-log-macros {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.food-log-remove {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--fs-h2);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space-2);
+}
+
 .splash-screen {
   position: fixed;
   inset: 0;

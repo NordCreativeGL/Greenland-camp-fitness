@@ -1,4 +1,4 @@
-const CACHE_NAME = 'campapp-v15';
+const CACHE_NAME = 'campapp-v16';
 
 const APP_SHELL = [
   './',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './css/style.css',
   './js/app.js',
   './js/data/exercises.js',
+  './js/data/foods.js',
   './js/data/schedule.js',
   './js/data/formGuide.js',
   './js/program.js',
