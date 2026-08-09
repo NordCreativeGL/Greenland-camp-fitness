@@ -218,6 +218,30 @@ textarea {
   z-index: 100;
 }
 
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard-logo {
+  width: 220px;
+  height: 220px;
+  animation: dashboard-logo-in 0.7s ease-out;
+}
+
+@keyframes dashboard-logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .dashboard-overlay button {
   font-family: var(--font-display);
   text-transform: uppercase;
