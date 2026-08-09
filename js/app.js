@@ -902,6 +902,12 @@
     }
   }
 
+  function initSplash() {
+    window.setTimeout(() => {
+      document.getElementById('splash-screen').classList.add('splash-hidden');
+    }, 900);
+  }
+
   initTabs();
   initDashboard();
   initGlossary();
@@ -909,4 +915,5 @@
   renderDayCounter();
   renderTrainingView();
   initServiceWorker();
+  initSplash();
 })();

@@ -426,6 +426,39 @@ textarea {
   display: none !important;
 }
 
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  transition: opacity 0.4s ease-out;
+}
+
+.splash-screen.splash-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-logo {
+  width: 160px;
+  height: 160px;
+  animation: splash-logo-in 0.7s ease-out;
+}
+
+@keyframes splash-logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .light-day-banner {
   background: var(--color-accent-flare);
   color: var(--color-text);
