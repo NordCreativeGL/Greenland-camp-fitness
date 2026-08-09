@@ -91,6 +91,13 @@
     const select = document.createElement('select');
     select.className = 'food-select';
 
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = 'Vælg fødevare';
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    select.appendChild(placeholderOption);
+
     const categories = {};
     Object.keys(FOOD_DATABASE).forEach((key) => {
       const food = FOOD_DATABASE[key];
