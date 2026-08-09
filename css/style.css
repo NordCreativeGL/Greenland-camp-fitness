@@ -528,20 +528,77 @@ textarea {
   border-radius: var(--radius);
   padding: var(--space-3);
   margin-bottom: var(--space-3);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
-.food-totals-value {
-  font-family: var(--font-mono);
+.food-ring-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+.food-ring-wrap svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.food-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-ring-big {
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: var(--fs-display);
-  color: var(--color-accent-ice);
+  color: var(--color-text);
 }
 
-.food-totals-macros {
+.food-ring-small {
   font-family: var(--font-mono);
-  font-size: var(--fs-small);
+  font-size: 10px;
   color: var(--color-text-muted);
-  margin-top: 4px;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.food-macro-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.food-macro-bar-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
+.food-macro-bar {
+  height: 6px;
+  background: var(--color-panel);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.food-macro-bar-fill {
+  height: 100%;
+  background: var(--color-accent-ice);
+}
+
+.food-macro-bar-fill.over {
+  background: var(--color-accent-flare);
 }
 
 .food-log-list {

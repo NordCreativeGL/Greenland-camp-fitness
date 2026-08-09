@@ -232,16 +232,76 @@
       return acc;
     }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
 
+    function buildRingSvg(pct, color) {
+      const size = 140;
+      const stroke = 12;
+      const r = (size - stroke) / 2;
+      const circumference = 2 * Math.PI * r;
+      const clamped = Math.min(Math.max(pct, 0), 1);
+      const offset = circumference * (1 - clamped);
+      const cx = size / 2;
+      const cy = size / 2;
+      return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#131C24" stroke-width="${stroke}"></circle>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"></circle>
+      </svg>`;
+    }
+
+    function buildMacroBar(label, consumed, target) {
+      const row = document.createElement('div');
+      row.className = 'food-macro-bar-row';
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'food-macro-bar-label';
+      labelEl.textContent = `${label} ${Math.round(consumed * 10) / 10}g / ${target}g`;
+
+      const barEl = document.createElement('div');
+      barEl.className = 'food-macro-bar';
+      const fillEl = document.createElement('div');
+      fillEl.className = 'food-macro-bar-fill';
+      const pct = Math.min(consumed / target, 1) * 100;
+      fillEl.style.width = `${pct}%`;
+      if (consumed > target) {
+        fillEl.classList.add('over');
+      }
+      barEl.appendChild(fillEl);
+
+      row.appendChild(labelEl);
+      row.appendChild(barEl);
+      return row;
+    }
+
+    const kcalRemaining = DAILY_TARGETS.kcal - totals.kcal;
+    const kcalPct = totals.kcal / DAILY_TARGETS.kcal;
+    const isOverKcal = kcalRemaining < 0;
+
     const totalsEl = document.createElement('div');
     totalsEl.className = 'food-totals';
-    const totalsValueEl = document.createElement('div');
-    totalsValueEl.className = 'food-totals-value';
-    totalsValueEl.textContent = `${Math.round(totals.kcal)} kcal`;
-    const totalsMacrosEl = document.createElement('div');
-    totalsMacrosEl.className = 'food-totals-macros';
-    totalsMacrosEl.textContent = `P ${Math.round(totals.protein * 10) / 10}g · K ${Math.round(totals.carbs * 10) / 10}g · F ${Math.round(totals.fat * 10) / 10}g`;
-    totalsEl.appendChild(totalsValueEl);
-    totalsEl.appendChild(totalsMacrosEl);
+
+    const ringWrap = document.createElement('div');
+    ringWrap.className = 'food-ring-wrap';
+    ringWrap.innerHTML = buildRingSvg(kcalPct, isOverKcal ? '#E8543A' : '#8FD8E0');
+
+    const ringCenter = document.createElement('div');
+    ringCenter.className = 'food-ring-center';
+    const ringBig = document.createElement('div');
+    ringBig.className = 'food-ring-big';
+    ringBig.textContent = Math.abs(Math.round(kcalRemaining));
+    const ringSmall = document.createElement('div');
+    ringSmall.className = 'food-ring-small';
+    ringSmall.textContent = isOverKcal ? 'KCAL OVER' : 'KCAL TILBAGE';
+    ringCenter.appendChild(ringBig);
+    ringCenter.appendChild(ringSmall);
+    ringWrap.appendChild(ringCenter);
+    totalsEl.appendChild(ringWrap);
+
+    const macroBars = document.createElement('div');
+    macroBars.className = 'food-macro-bars';
+    macroBars.appendChild(buildMacroBar('Protein', totals.protein, DAILY_TARGETS.protein));
+    macroBars.appendChild(buildMacroBar('Kulhydrat', totals.carbs, DAILY_TARGETS.carbs));
+    macroBars.appendChild(buildMacroBar('Fedt', totals.fat, DAILY_TARGETS.fat));
+    totalsEl.appendChild(macroBars);
+
     container.appendChild(totalsEl);
 
     const list = document.createElement('div');
