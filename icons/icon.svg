@@ -3,4 +3,5 @@
   <polygon points="256,120 356,320 156,320" fill="#8FD8E0"/>
   <polygon points="150,180 230,320 70,320" fill="#8FD8E0" opacity="0.75"/>
   <polygon points="362,180 442,320 282,320" fill="#8FD8E0" opacity="0.75"/>
+  <text x="256" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="72" letter-spacing="6" fill="#E5EDF0">REACT</text>
 </svg>
