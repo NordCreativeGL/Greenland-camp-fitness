@@ -143,8 +143,7 @@
         kcal: macros.kcal,
         protein: macros.protein,
         carbs: macros.carbs,
-        fat: macros.fat,
-        isFreetext: false
+        fat: macros.fat
       });
       saveFoodLog(dayNumber, newEntries);
       renderFoodView();
@@ -155,13 +154,41 @@
     form.appendChild(addBtn);
     container.appendChild(form);
 
-    const freetextForm = document.createElement('div');
-    freetextForm.className = 'food-freetext-form';
+    const freetextCard = document.createElement('div');
+    freetextCard.className = 'food-freetext-card';
 
     const freetextInput = document.createElement('input');
     freetextInput.type = 'text';
     freetextInput.className = 'food-freetext-input';
     freetextInput.placeholder = 'Andet — skriv hvad du spiste';
+
+    const macroInputsRow = document.createElement('div');
+    macroInputsRow.className = 'food-macro-inputs';
+
+    const kcalInput = document.createElement('input');
+    kcalInput.type = 'number';
+    kcalInput.className = 'food-macro-input';
+    kcalInput.placeholder = 'kcal';
+
+    const proteinInput = document.createElement('input');
+    proteinInput.type = 'number';
+    proteinInput.className = 'food-macro-input';
+    proteinInput.placeholder = 'Protein g';
+
+    const carbsInput = document.createElement('input');
+    carbsInput.type = 'number';
+    carbsInput.className = 'food-macro-input';
+    carbsInput.placeholder = 'Kulhydrat g';
+
+    const fatInput = document.createElement('input');
+    fatInput.type = 'number';
+    fatInput.className = 'food-macro-input';
+    fatInput.placeholder = 'Fedt g';
+
+    macroInputsRow.appendChild(kcalInput);
+    macroInputsRow.appendChild(proteinInput);
+    macroInputsRow.appendChild(carbsInput);
+    macroInputsRow.appendChild(fatInput);
 
     const freetextAddBtn = document.createElement('button');
     freetextAddBtn.className = 'food-add-btn food-add-btn--secondary';
@@ -171,31 +198,36 @@
       if (!text) {
         return;
       }
+      const kcalVal = kcalInput.value.trim() === '' ? null : parseFloat(kcalInput.value);
+      const proteinVal = proteinInput.value.trim() === '' ? 0 : parseFloat(proteinInput.value);
+      const carbsVal = carbsInput.value.trim() === '' ? 0 : parseFloat(carbsInput.value);
+      const fatVal = fatInput.value.trim() === '' ? 0 : parseFloat(fatInput.value);
+
       const newEntries = getFoodLog(dayNumber);
       newEntries.push({
         id: Date.now(),
         label: text,
         grams: null,
-        kcal: null,
-        protein: null,
-        carbs: null,
-        fat: null,
-        isFreetext: true
+        kcal: kcalVal !== null && !isNaN(kcalVal) ? kcalVal : null,
+        protein: proteinVal,
+        carbs: carbsVal,
+        fat: fatVal
       });
       saveFoodLog(dayNumber, newEntries);
       renderFoodView();
     });
 
-    freetextForm.appendChild(freetextInput);
-    freetextForm.appendChild(freetextAddBtn);
-    container.appendChild(freetextForm);
+    freetextCard.appendChild(freetextInput);
+    freetextCard.appendChild(macroInputsRow);
+    freetextCard.appendChild(freetextAddBtn);
+    container.appendChild(freetextCard);
 
     const totals = entries.reduce((acc, entry) => {
-      if (!entry.isFreetext) {
+      if (entry.kcal !== null && entry.kcal !== undefined) {
         acc.kcal += entry.kcal;
-        acc.protein += entry.protein;
-        acc.carbs += entry.carbs;
-        acc.fat += entry.fat;
+        acc.protein += entry.protein || 0;
+        acc.carbs += entry.carbs || 0;
+        acc.fat += entry.fat || 0;
       }
       return acc;
     }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
@@ -231,14 +263,14 @@
 
       const nameEl = document.createElement('div');
       nameEl.className = 'food-log-name';
-      nameEl.textContent = entry.isFreetext ? entry.label : `${entry.label} · ${entry.grams}g`;
+      nameEl.textContent = entry.grams ? `${entry.label} · ${entry.grams}g` : entry.label;
       info.appendChild(nameEl);
 
       const macroEl = document.createElement('div');
       macroEl.className = 'food-log-macros';
-      macroEl.textContent = entry.isFreetext
-        ? 'Ikke beregnet'
-        : `${entry.kcal} kcal · P ${entry.protein}g · K ${entry.carbs}g · F ${entry.fat}g`;
+      macroEl.textContent = (entry.kcal !== null && entry.kcal !== undefined)
+        ? `${entry.kcal} kcal · P ${entry.protein}g · K ${entry.carbs}g · F ${entry.fat}g`
+        : 'Ikke beregnet';
       info.appendChild(macroEl);
 
       const removeBtn = document.createElement('button');
