@@ -40,6 +40,7 @@
     document.querySelectorAll('.view').forEach((section) => {
       section.classList.toggle('active', section.id === `view-${view}`);
     });
+    document.querySelector('.tabbar').classList.toggle('hidden', view === 'dashboard');
   }
 
   function initTabs() {
@@ -128,12 +129,98 @@
     };
   }
 
+  function isDayFullyComplete(dayNumber) {
+    const completion = getDayCompletion(dayNumber);
+    return completion.total === 0 || completion.completed === completion.total;
+  }
+
+  function getWeekSetsLogged(weekNumber) {
+    const weekStartDay = (weekNumber - 1) * 7 + 1;
+    let totalSets = 0;
+
+    for (let i = 0; i < 7; i++) {
+      const dayNumber = weekStartDay + i;
+      if (dayNumber > TOTAL_DAYS) {
+        break;
+      }
+      const program = getProgramForDay(dayNumber);
+      program.sessions.forEach((sessionData) => {
+        if (sessionData.mode === 'lightDay') {
+          return;
+        }
+        getLoggableExercises(sessionData).forEach((exercise) => {
+          const setsTarget = exercise.sets || 1;
+          const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, sessionData.session);
+          const setLog = getSetLog(logKey, setsTarget);
+          totalSets += setLog.filter(Boolean).length;
+        });
+      });
+    }
+
+    return totalSets;
+  }
+
+  function getStreak(todayNumber) {
+    let streak = 0;
+    let d = todayNumber;
+    if (!isDayFullyComplete(d)) {
+      d -= 1;
+    }
+    while (d >= 1 && isDayFullyComplete(d)) {
+      streak += 1;
+      d -= 1;
+    }
+    return streak;
+  }
+
+  let dashboardViewedWeek = null;
+
+  function renderDashboardWeekStrip(weekNumber) {
+    const todayNumber = getCurrentDayNumber();
+    const weekStartDay = (weekNumber - 1) * 7 + 1;
+    const weekEndDay = Math.min(TOTAL_DAYS, weekStartDay + 6);
+
+    document.getElementById('dashboard-week-range').textContent =
+      `Uge ${weekNumber} · Dag ${weekStartDay}–${weekEndDay}`;
+
+    const strip = document.getElementById('dashboard-week-strip');
+    strip.innerHTML = '';
+
+    for (let dayNumber = weekStartDay; dayNumber <= weekEndDay; dayNumber++) {
+      const isDone = dayNumber <= todayNumber && isDayFullyComplete(dayNumber);
+
+      const dayEl = document.createElement('div');
+      dayEl.className = 'dashboard-week-day';
+      dayEl.classList.toggle('today', dayNumber === todayNumber);
+      dayEl.classList.toggle('done', isDone);
+
+      const numberEl = document.createElement('div');
+      numberEl.textContent = String(dayNumber);
+      dayEl.appendChild(numberEl);
+
+      const dotEl = document.createElement('div');
+      dotEl.className = 'dashboard-week-day-dot';
+      dayEl.appendChild(dotEl);
+
+      dayEl.addEventListener('click', () => {
+        setActiveTab('training');
+        localStorage.setItem(TAB_KEY, 'training');
+        renderTrainingView(dayNumber);
+      });
+
+      strip.appendChild(dayEl);
+    }
+
+    document.getElementById('week-prev-btn').disabled = weekNumber <= 1;
+    document.getElementById('week-next-btn').disabled = weekNumber >= Math.ceil(TOTAL_DAYS / 7);
+  }
+
   function renderDayCounter(dayNumber) {
     const dayCounterEl = document.getElementById('day-counter');
     const startDateRaw = localStorage.getItem(START_KEY);
 
     if (!startDateRaw) {
-      document.getElementById('dashboard-overlay').classList.remove('hidden');
+      setActiveTab('dashboard');
       return;
     }
 
@@ -143,36 +230,72 @@
 
   function renderDashboardStatus() {
     const summary = getDashboardSummary();
-    document.getElementById('dashboard-day').textContent = `DAG ${summary.dayNumber} / ${TOTAL_DAYS}`;
-    document.getElementById('dashboard-phase').textContent = `Uge ${summary.weekNumber} · ${summary.phaseLabel}`;
-    document.getElementById('dashboard-sessions').textContent = summary.sessionCodes.join(' · ');
-    document.getElementById('dashboard-progress').textContent = summary.isLightDay
+    const todayNumber = summary.dayNumber;
+
+    document.getElementById('dashboard-day-label').textContent = `Dag ${summary.dayNumber}`;
+    document.getElementById('dashboard-week-label').textContent = `Uge ${summary.weekNumber}`;
+    document.getElementById('dashboard-phase').textContent = summary.phaseLabel;
+
+    const sessionsEl = document.getElementById('dashboard-sessions');
+    sessionsEl.innerHTML = '';
+    summary.sessionCodes.forEach((code) => {
+      const pill = document.createElement('span');
+      pill.className = 'dashboard-session-pill';
+      pill.textContent = code;
+      sessionsEl.appendChild(pill);
+    });
+
+    const pct = summary.total > 0 ? Math.round((summary.completed / summary.total) * 100) : 100;
+    document.getElementById('dashboard-progress-fill').style.width = `${pct}%`;
+    document.getElementById('dashboard-progress-label').textContent = summary.isLightDay
       ? 'Aktiv restitution'
       : `${summary.completed}/${summary.total} øvelser fuldført`;
-    document.getElementById('start-day-btn').textContent = `START DAG ${summary.dayNumber}`;
-    document.getElementById('food-day-btn').textContent = `KOST DAG ${summary.dayNumber}`;
+
+    document.getElementById('dashboard-kost-day-label').textContent = `Dag ${summary.dayNumber}`;
+
+    document.getElementById('stat-sets').textContent = getWeekSetsLogged(summary.weekNumber);
+    document.getElementById('stat-streak').textContent = getStreak(todayNumber);
+    document.getElementById('stat-program').textContent = `${Math.round((todayNumber / TOTAL_DAYS) * 100)}%`;
+
+    dashboardViewedWeek = summary.weekNumber;
+    renderDashboardWeekStrip(dashboardViewedWeek);
   }
 
   function initDashboard() {
     renderDashboardStatus();
+
     document.getElementById('start-day-btn').addEventListener('click', () => {
       if (!localStorage.getItem(START_KEY)) {
         localStorage.setItem(START_KEY, new Date().toISOString());
       }
-      document.getElementById('dashboard-overlay').classList.add('hidden');
       setActiveTab('training');
       localStorage.setItem(TAB_KEY, 'training');
       renderDayCounter();
       renderTrainingView();
     });
+
     document.getElementById('food-day-btn').addEventListener('click', () => {
-      document.getElementById('dashboard-overlay').classList.add('hidden');
       setActiveTab('food');
       localStorage.setItem(TAB_KEY, 'food');
     });
+
     document.getElementById('app-title').addEventListener('click', () => {
       renderDashboardStatus();
-      document.getElementById('dashboard-overlay').classList.remove('hidden');
+      setActiveTab('dashboard');
+    });
+
+    document.getElementById('week-prev-btn').addEventListener('click', () => {
+      if (dashboardViewedWeek > 1) {
+        dashboardViewedWeek -= 1;
+        renderDashboardWeekStrip(dashboardViewedWeek);
+      }
+    });
+
+    document.getElementById('week-next-btn').addEventListener('click', () => {
+      if (dashboardViewedWeek < Math.ceil(TOTAL_DAYS / 7)) {
+        dashboardViewedWeek += 1;
+        renderDashboardWeekStrip(dashboardViewedWeek);
+      }
     });
   }
 

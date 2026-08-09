@@ -34,21 +34,53 @@
     <button data-view="food" class="tab-btn">KOST</button>
   </nav>
 
-  <div id="dashboard-overlay" class="dashboard-overlay hidden">
-    <div class="dashboard-content">
-      <img src="./icons/icon.svg" alt="React" class="dashboard-logo">
-      <div class="dashboard-today">
-        <div id="dashboard-day" class="dashboard-day"></div>
-        <div id="dashboard-phase" class="dashboard-phase"></div>
-        <div id="dashboard-sessions" class="dashboard-sessions"></div>
-        <div id="dashboard-progress" class="dashboard-progress"></div>
+  <main id="view-dashboard" class="view">
+    <div class="dashboard-section-title">Træning i dag</div>
+    <div class="dashboard-card card--bracket">
+      <div class="dashboard-card-label" id="dashboard-day-label"></div>
+      <div class="dashboard-week-heading" id="dashboard-week-label"></div>
+      <div class="dashboard-phase" id="dashboard-phase"></div>
+      <div class="dashboard-sessions" id="dashboard-sessions"></div>
+      <div class="dashboard-progress-bar"><div class="dashboard-progress-fill" id="dashboard-progress-fill"></div></div>
+      <div class="dashboard-progress-label" id="dashboard-progress-label"></div>
+      <button id="start-day-btn" class="dashboard-btn dashboard-btn--primary">ÅBN TRÆNING</button>
+    </div>
+
+    <div class="dashboard-section-title">Kost i dag</div>
+    <div class="dashboard-card dashboard-card--dashed">
+      <div class="dashboard-card-label" id="dashboard-kost-day-label"></div>
+      <div class="dashboard-kost-empty">Kost-loggen er ikke sat op endnu — kommer i en senere opgave.</div>
+      <button id="food-day-btn" class="dashboard-btn dashboard-btn--secondary">ÅBN KOST</button>
+    </div>
+
+    <div class="dashboard-section-title">Denne uge</div>
+    <div class="dashboard-card">
+      <div class="dashboard-week-nav">
+        <button id="week-prev-btn" class="dashboard-week-arrow" aria-label="Forrige uge">‹</button>
+        <div class="dashboard-week-range" id="dashboard-week-range"></div>
+        <button id="week-next-btn" class="dashboard-week-arrow" aria-label="Næste uge">›</button>
       </div>
-      <div class="dashboard-actions">
-        <button id="start-day-btn" class="dashboard-btn dashboard-btn--primary">START DAG 1</button>
-        <button id="food-day-btn" class="dashboard-btn dashboard-btn--secondary">KOST DAG 1</button>
+      <div class="dashboard-week-strip" id="dashboard-week-strip"></div>
+    </div>
+
+    <div class="dashboard-section-title">Fremgang</div>
+    <div class="dashboard-card">
+      <div class="dashboard-stats-row">
+        <div class="dashboard-stat">
+          <div class="dashboard-stat-value" id="stat-sets"></div>
+          <div class="dashboard-stat-label">Sæt denne uge</div>
+        </div>
+        <div class="dashboard-stat">
+          <div class="dashboard-stat-value" id="stat-streak"></div>
+          <div class="dashboard-stat-label">Dages streak</div>
+        </div>
+        <div class="dashboard-stat">
+          <div class="dashboard-stat-value" id="stat-program"></div>
+          <div class="dashboard-stat-label">Program</div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <div id="glossary-overlay" class="glossary-overlay hidden">
     <div class="glossary-panel">
