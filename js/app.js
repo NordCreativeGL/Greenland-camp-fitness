@@ -142,7 +142,15 @@
   }
 
   function renderDashboardStatus() {
-    document.getElementById('dashboard-day').textContent = `DAG ${getCurrentDayNumber()} / ${TOTAL_DAYS}`;
+    const summary = getDashboardSummary();
+    document.getElementById('dashboard-day').textContent = `DAG ${summary.dayNumber} / ${TOTAL_DAYS}`;
+    document.getElementById('dashboard-phase').textContent = `Uge ${summary.weekNumber} · ${summary.phaseLabel}`;
+    document.getElementById('dashboard-sessions').textContent = summary.sessionCodes.join(' · ');
+    document.getElementById('dashboard-progress').textContent = summary.isLightDay
+      ? 'Aktiv restitution'
+      : `${summary.completed}/${summary.total} øvelser fuldført`;
+    document.getElementById('start-day-btn').textContent = `START DAG ${summary.dayNumber}`;
+    document.getElementById('food-day-btn').textContent = `KOST DAG ${summary.dayNumber}`;
   }
 
   function initDashboard() {

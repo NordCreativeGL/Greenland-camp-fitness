@@ -231,10 +231,38 @@ textarea {
   box-sizing: border-box;
 }
 
+.dashboard-today {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
 .dashboard-day {
   font-family: var(--font-mono);
   font-size: var(--fs-mono-data);
   color: var(--color-accent-ice);
+}
+
+.dashboard-phase {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dashboard-sessions {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-accent-ice);
+  letter-spacing: 0.05em;
+}
+
+.dashboard-progress {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
 }
 
 .dashboard-actions {
