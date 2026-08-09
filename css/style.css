@@ -225,6 +225,23 @@ textarea {
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
+  width: 100%;
+  max-width: 320px;
+  padding: 0 var(--space-4);
+  box-sizing: border-box;
+}
+
+.dashboard-day {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-data);
+  color: var(--color-accent-ice);
+}
+
+.dashboard-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
 }
 
 .dashboard-logo {
@@ -244,16 +261,28 @@ textarea {
   }
 }
 
-.dashboard-overlay button {
+.dashboard-btn {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: var(--fs-h1);
-  background: var(--color-accent-flare);
-  color: var(--color-text);
   border: none;
   border-radius: var(--radius);
   padding: var(--space-3) var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dashboard-btn--primary {
+  font-size: var(--fs-h1);
+  background: var(--color-accent-flare);
+  color: var(--color-text);
+}
+
+.dashboard-btn--secondary {
+  font-size: var(--fs-body);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-accent-ice);
 }
 
 .hidden {

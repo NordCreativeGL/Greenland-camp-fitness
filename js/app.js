@@ -86,14 +86,29 @@
     dayCounterEl.textContent = `DAG ${displayDay} / ${TOTAL_DAYS}`;
   }
 
+  function renderDashboardStatus() {
+    document.getElementById('dashboard-day').textContent = `DAG ${getCurrentDayNumber()} / ${TOTAL_DAYS}`;
+  }
+
   function initDashboard() {
+    renderDashboardStatus();
     document.getElementById('start-day-btn').addEventListener('click', () => {
-      localStorage.setItem(START_KEY, new Date().toISOString());
+      if (!localStorage.getItem(START_KEY)) {
+        localStorage.setItem(START_KEY, new Date().toISOString());
+      }
       document.getElementById('dashboard-overlay').classList.add('hidden');
+      setActiveTab('training');
+      localStorage.setItem(TAB_KEY, 'training');
       renderDayCounter();
       renderTrainingView();
     });
+    document.getElementById('food-day-btn').addEventListener('click', () => {
+      document.getElementById('dashboard-overlay').classList.add('hidden');
+      setActiveTab('food');
+      localStorage.setItem(TAB_KEY, 'food');
+    });
     document.getElementById('app-title').addEventListener('click', () => {
+      renderDashboardStatus();
       document.getElementById('dashboard-overlay').classList.remove('hidden');
     });
   }
