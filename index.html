@@ -11,7 +11,12 @@
 </head>
 <body>
   <header class="topbar">
-    <h1>React</h1>
+    <div class="topbar-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <h1>React</h1>
+    </div>
     <div class="topbar-right">
       <span id="day-counter">DAG — / 42</span>
       <button id="glossary-btn" class="glossary-btn" aria-label="Forklaring af forkortelser">?</button>
@@ -24,13 +29,9 @@
   <main id="view-food" class="view">
   </main>
 
-  <main id="view-menu" class="view">
-  </main>
-
   <nav class="tabbar">
     <button data-view="training" class="tab-btn active">TRÆNING</button>
     <button data-view="food" class="tab-btn">KOST</button>
-    <button data-view="menu" class="tab-btn">MENU</button>
   </nav>
 
   <div id="start-overlay" class="start-overlay hidden">
@@ -41,6 +42,13 @@
     <div class="glossary-panel">
       <button id="glossary-close-btn" class="glossary-close-btn" aria-label="Luk">×</button>
       <div id="glossary-content"></div>
+    </div>
+  </div>
+
+  <div id="menu-overlay" class="menu-overlay hidden">
+    <div class="menu-panel">
+      <button id="menu-close-btn" class="menu-close-btn" aria-label="Luk">×</button>
+      <div id="menu-content"></div>
     </div>
   </div>
 

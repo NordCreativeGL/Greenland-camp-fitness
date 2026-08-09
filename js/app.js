@@ -156,6 +156,21 @@
     });
   }
 
+  function initMenu() {
+    const overlay = document.getElementById('menu-overlay');
+    document.getElementById('menu-btn').addEventListener('click', () => {
+      overlay.classList.remove('hidden');
+    });
+    document.getElementById('menu-close-btn').addEventListener('click', () => {
+      overlay.classList.add('hidden');
+    });
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        overlay.classList.add('hidden');
+      }
+    });
+  }
+
   function buildLogKey(dayNumber, category, part, session) {
     return `gcf:${CURRENT_PROFILE_ID}:${PROGRAM_VERSION}:log_day${dayNumber}_${category}_${part}_${session}`;
   }
@@ -686,6 +701,7 @@
   initTabs();
   initStartOverlay();
   initGlossary();
+  initMenu();
   renderDayCounter();
   renderTrainingView();
   initServiceWorker();
