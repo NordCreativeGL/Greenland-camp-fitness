@@ -486,7 +486,7 @@
 
     document.getElementById('dashboard-kost-summary').textContent = foodTotals.count > 0
       ? `${Math.round(foodTotals.kcal)} kcal logget i dag (${foodTotals.count} ${foodTotals.count === 1 ? 'post' : 'poster'})`
-      : 'Intet logget endnu i dag.';
+      : 'Intet logget';
 
     document.getElementById('stat-sets').textContent = getWeekSetsLogged(summary.weekNumber);
     document.getElementById('stat-streak').textContent = getStreak(todayNumber);
