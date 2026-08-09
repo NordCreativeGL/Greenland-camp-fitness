@@ -73,6 +73,61 @@
     );
   }
 
+  const PROGRAM_PHASES = [
+    { weeks: [1], label: 'Kalibrering' },
+    { weeks: [2, 3], label: 'Akkumulering' },
+    { weeks: [4], label: 'Konsolidering' },
+    { weeks: [5, 6], label: 'Intensivering' }
+  ];
+
+  function getPhaseLabel(weekNumber) {
+    const phase = PROGRAM_PHASES.find((p) => p.weeks.includes(weekNumber));
+    return phase ? phase.label : '';
+  }
+
+  function getDayCompletion(dayNumber) {
+    const program = getProgramForDay(dayNumber);
+    let total = 0;
+    let completed = 0;
+
+    program.sessions.forEach((sessionData) => {
+      if (sessionData.mode === 'lightDay') {
+        return;
+      }
+      getLoggableExercises(sessionData).forEach((exercise) => {
+        const setsTarget = exercise.sets || 1;
+        const logKey = buildLogKey(dayNumber, exercise.category, exercise.part, sessionData.session);
+        const setLog = getSetLog(logKey, setsTarget);
+        total += 1;
+        if (isExerciseComplete(setLog)) {
+          completed += 1;
+        }
+      });
+    });
+
+    return { completed, total };
+  }
+
+  function getDashboardSummary(dayNumber = getCurrentDayNumber()) {
+    const program = getProgramForDay(dayNumber);
+    const scheduleEntry = WEEKLY_SCHEDULE[program.dayOfWeek - 1];
+    const completion = getDayCompletion(dayNumber);
+
+    const sessionCodes = program.isLightDay
+      ? ['LET']
+      : ['morgen', 'middag', 'aften'].map((session) => getSessionCode(scheduleEntry.sessions[session]));
+
+    return {
+      dayNumber,
+      weekNumber: program.weekNumber,
+      phaseLabel: getPhaseLabel(program.weekNumber),
+      isLightDay: program.isLightDay,
+      sessionCodes,
+      completed: completion.completed,
+      total: completion.total
+    };
+  }
+
   function renderDayCounter(dayNumber) {
     const dayCounterEl = document.getElementById('day-counter');
     const startDateRaw = localStorage.getItem(START_KEY);
