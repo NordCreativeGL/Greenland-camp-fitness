@@ -451,6 +451,16 @@ textarea {
   padding: var(--space-2);
 }
 
+.food-unit-select {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  padding: var(--space-2) 4px;
+}
+
 .food-grams-input {
   width: 72px;
   background: var(--color-panel);
