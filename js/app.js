@@ -411,10 +411,10 @@
   }
 
   const PROGRAM_PHASES = [
-    { weeks: [1], label: 'Kalibrering' },
-    { weeks: [2, 3], label: 'Akkumulering' },
-    { weeks: [4], label: 'Konsolidering' },
-    { weeks: [5, 6], label: 'Intensivering' }
+    { weeks: [1], label: 'Baseline' },
+    { weeks: [2, 3], label: 'Volumen' },
+    { weeks: [4], label: 'Belastning' },
+    { weeks: [5, 6], label: 'Peak' }
   ];
 
   function getPhaseLabel(weekNumber) {
