@@ -64,6 +64,27 @@
     localStorage.setItem(buildFoodLogKey(dayNumber), JSON.stringify(entries));
   }
 
+  function exportBackup() {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('gcf:')) {
+        data[key] = localStorage.getItem(key);
+      }
+    }
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `react-backup-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   function buildRingSvg(pct, color) {
     const size = 140;
     const stroke = 12;
@@ -724,6 +745,26 @@
 
   function initMenu() {
     const overlay = document.getElementById('menu-overlay');
+    const content = document.getElementById('menu-content');
+
+    const backupLabel = document.createElement('div');
+    backupLabel.className = 'dashboard-card-label';
+    backupLabel.textContent = 'Backup';
+    content.appendChild(backupLabel);
+
+    const backupText = document.createElement('div');
+    backupText.className = 'dashboard-kost-empty';
+    backupText.textContent = 'Gem en sikkerhedskopi af al din trænings- og kostdata som fil.';
+    content.appendChild(backupText);
+
+    const backupBtn = document.createElement('button');
+    backupBtn.className = 'dashboard-btn dashboard-btn--secondary';
+    backupBtn.textContent = 'Eksportér backup';
+    backupBtn.addEventListener('click', () => {
+      exportBackup();
+    });
+    content.appendChild(backupBtn);
+
     document.getElementById('menu-btn').addEventListener('click', () => {
       overlay.classList.remove('hidden');
     });
