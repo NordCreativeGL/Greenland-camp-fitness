@@ -1,4 +1,4 @@
-const CACHE_NAME = 'campapp-v25';
+const CACHE_NAME = 'campapp-v26';
 
 const APP_SHELL = [
   './',

@@ -709,7 +709,6 @@
     document.getElementById('start-day-btn').addEventListener('click', () => {
       setActiveTab('training');
       localStorage.setItem(TAB_KEY, 'training');
-      renderDayCounter();
       renderTrainingView();
     });
 
