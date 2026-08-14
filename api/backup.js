@@ -8,8 +8,9 @@ const redis = new Redis({
 const BACKUP_KEY = 'gcf-backup:default';
 
 export default async function handler(req, res) {
-  const secret = req.headers['x-backup-secret'];
-  if (!secret || secret !== process.env.BACKUP_SECRET) {
+  const allowedOrigin = 'https://react-strong.vercel.app';
+  const origin = req.headers['origin'] || req.headers['referer'] || '';
+  if (!origin.startsWith(allowedOrigin)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

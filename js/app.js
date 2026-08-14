@@ -62,6 +62,7 @@
 
   function saveFoodLog(dayNumber, entries) {
     localStorage.setItem(buildFoodLogKey(dayNumber), JSON.stringify(entries));
+    syncToCloud();
   }
 
   function exportBackup() {
@@ -84,6 +85,29 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     localStorage.setItem(`gcf:${CURRENT_PROFILE_ID}:last_backup_at`, new Date().toISOString());
+  }
+
+  let cloudSyncTimer = null;
+  function syncToCloud() {
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(async () => {
+      try {
+        const data = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('gcf:')) {
+            data[key] = localStorage.getItem(key);
+          }
+        }
+        await fetch('/api/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+      } catch (err) {
+        console.warn('Cloud sync failed (will retry on next change):', err);
+      }
+    }, 2000);
   }
 
   const DANISH_MONTHS = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
@@ -666,6 +690,7 @@
     document.getElementById('start-day-btn').addEventListener('click', () => {
       if (!localStorage.getItem(START_KEY)) {
         localStorage.setItem(START_KEY, new Date().toISOString());
+        syncToCloud();
       }
       setActiveTab('training');
       localStorage.setItem(TAB_KEY, 'training');
@@ -826,6 +851,7 @@
 
   function saveSetLog(logKey, setLog) {
     localStorage.setItem(logKey, JSON.stringify(setLog));
+    syncToCloud();
   }
 
   function isExerciseComplete(setLog) {
@@ -1073,6 +1099,7 @@
       if (interactive) {
         rpeBtn.addEventListener('click', () => {
           localStorage.setItem(rpeKey, option.key);
+          syncToCloud();
           rpeSelector.querySelectorAll('.rpe-btn').forEach((btn) => btn.classList.remove('selected'));
           rpeBtn.classList.add('selected');
         });
