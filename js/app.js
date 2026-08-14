@@ -83,6 +83,23 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    localStorage.setItem(`gcf:${CURRENT_PROFILE_ID}:last_backup_at`, new Date().toISOString());
+  }
+
+  const DANISH_MONTHS = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+  function formatLastBackupLabel() {
+    const raw = localStorage.getItem(`gcf:${CURRENT_PROFILE_ID}:last_backup_at`);
+    if (!raw) {
+      return 'Ingen backup taget endnu';
+    }
+    const date = new Date(raw);
+    const day = date.getDate();
+    const month = DANISH_MONTHS[date.getMonth()];
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `Sidste backup: ${day}. ${month} ${year}, ${hours}:${minutes}`;
   }
 
   function buildRingSvg(pct, color) {
@@ -765,7 +782,13 @@
     });
     content.appendChild(backupBtn);
 
+    const backupTimeEl = document.createElement('div');
+    backupTimeEl.className = 'dashboard-progress-label';
+    backupTimeEl.textContent = formatLastBackupLabel();
+    content.appendChild(backupTimeEl);
+
     document.getElementById('menu-btn').addEventListener('click', () => {
+      backupTimeEl.textContent = formatLastBackupLabel();
       overlay.classList.remove('hidden');
     });
     document.getElementById('menu-close-btn').addEventListener('click', () => {
