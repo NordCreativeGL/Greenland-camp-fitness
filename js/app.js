@@ -87,8 +87,20 @@
     localStorage.setItem(`gcf:${CURRENT_PROFILE_ID}:last_backup_at`, new Date().toISOString());
   }
 
+  const SYNC_SECRET_KEY = 'react_sync_secret_v1';
+  function getSyncSecret() {
+    return localStorage.getItem(SYNC_SECRET_KEY);
+  }
+  function setSyncSecret(value) {
+    localStorage.setItem(SYNC_SECRET_KEY, value.trim());
+  }
+
   let cloudSyncTimer = null;
   function syncToCloud() {
+    const secret = getSyncSecret();
+    if (!secret) {
+      return;
+    }
     clearTimeout(cloudSyncTimer);
     cloudSyncTimer = setTimeout(async () => {
       try {
@@ -101,7 +113,7 @@
         }
         await fetch('/api/backup', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'x-backup-secret': secret },
           body: JSON.stringify(data)
         });
       } catch (err) {
@@ -811,6 +823,52 @@
     backupTimeEl.className = 'dashboard-progress-label';
     backupTimeEl.textContent = formatLastBackupLabel();
     content.appendChild(backupTimeEl);
+
+    const syncSectionEl = document.createElement('div');
+    content.appendChild(syncSectionEl);
+
+    function renderSyncSection() {
+      syncSectionEl.innerHTML = '';
+
+      if (getSyncSecret()) {
+        const statusRow = document.createElement('div');
+        statusRow.className = 'dashboard-progress-label';
+        statusRow.textContent = 'Cloud-synk: aktiveret ';
+
+        const resetLink = document.createElement('a');
+        resetLink.href = '#';
+        resetLink.textContent = 'Nulstil';
+        resetLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          localStorage.removeItem(SYNC_SECRET_KEY);
+          renderSyncSection();
+        });
+        statusRow.appendChild(resetLink);
+
+        syncSectionEl.appendChild(statusRow);
+        return;
+      }
+
+      const secretInput = document.createElement('input');
+      secretInput.type = 'password';
+      secretInput.className = 'food-freetext-input';
+      secretInput.placeholder = 'Cloud-synk kode';
+      syncSectionEl.appendChild(secretInput);
+
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'dashboard-btn dashboard-btn--secondary';
+      saveBtn.textContent = 'Gem';
+      saveBtn.addEventListener('click', () => {
+        if (!secretInput.value.trim()) {
+          return;
+        }
+        setSyncSecret(secretInput.value);
+        renderSyncSection();
+      });
+      syncSectionEl.appendChild(saveBtn);
+    }
+
+    renderSyncSection();
 
     document.getElementById('menu-btn').addEventListener('click', () => {
       backupTimeEl.textContent = formatLastBackupLabel();
