@@ -544,6 +544,13 @@
     return completion.total === 0 || completion.completed === completion.total;
   }
 
+  function maybeLockStartDate() {
+    if (!localStorage.getItem(START_KEY) && isDayFullyComplete(1)) {
+      localStorage.setItem(START_KEY, new Date().toISOString());
+      syncToCloud();
+    }
+  }
+
   function getWeekSetsLogged(weekNumber) {
     const weekStartDay = (weekNumber - 1) * 7 + 1;
     let totalSets = 0;
@@ -700,10 +707,6 @@
     renderDashboardStatus();
 
     document.getElementById('start-day-btn').addEventListener('click', () => {
-      if (!localStorage.getItem(START_KEY)) {
-        localStorage.setItem(START_KEY, new Date().toISOString());
-        syncToCloud();
-      }
       setActiveTab('training');
       localStorage.setItem(TAB_KEY, 'training');
       renderDayCounter();
@@ -1134,6 +1137,7 @@
           setBtn.classList.toggle('checked', setLog[i]);
           setBtn.setAttribute('aria-pressed', String(setLog[i]));
           updateSessionProgress(dayNumber, session);
+          maybeLockStartDate();
         });
       }
 
@@ -1417,6 +1421,18 @@
     window.setTimeout(() => {
       document.getElementById('splash-screen').classList.add('splash-hidden');
     }, 900);
+  }
+
+  const START_DATE_MIGRATION_KEY = `gcf:${CURRENT_PROFILE_ID}:start_date_migration_v1_done`;
+  if (!localStorage.getItem(START_DATE_MIGRATION_KEY)) {
+    if (localStorage.getItem(START_KEY) && !isDayFullyComplete(1)) {
+      localStorage.removeItem(START_KEY);
+    }
+    localStorage.setItem(START_DATE_MIGRATION_KEY, '1');
+  }
+  if (!localStorage.getItem(START_KEY) && isDayFullyComplete(1)) {
+    localStorage.setItem(START_KEY, new Date().toISOString());
+    syncToCloud();
   }
 
   initTabs();
