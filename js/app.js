@@ -647,13 +647,6 @@
 
   function renderDayCounter(dayNumber) {
     const dayCounterEl = document.getElementById('day-counter');
-    const startDateRaw = localStorage.getItem(START_KEY);
-
-    if (!startDateRaw) {
-      setActiveTab('dashboard');
-      return;
-    }
-
     const displayDay = dayNumber === undefined ? getCurrentDayNumber() : dayNumber;
     dayCounterEl.textContent = `DAG ${displayDay} / ${TOTAL_DAYS}`;
   }
